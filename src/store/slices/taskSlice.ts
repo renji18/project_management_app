@@ -1,5 +1,11 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+export interface TaskMember {
+  userId: string;
+  type: "owner" | "member";
+  user: { id: string; name: string; email: string };
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -7,6 +13,8 @@ export interface Task {
   priority: "low" | "medium" | "high";
   status: "pending" | "in-progress" | "completed";
   deadline?: string;
+  userId?: string;
+  members: TaskMember[];
 }
 
 interface TaskState {
@@ -25,7 +33,7 @@ const taskSlice = createSlice({
       state.tasks = action.payload;
     },
     addTask: (state, action: PayloadAction<Task>) => {
-      state.tasks.push(action.payload);
+      state.tasks.unshift(action.payload);
     },
     updateTask: (state, action: PayloadAction<Task>) => {
       state.tasks = state.tasks.map((task) =>

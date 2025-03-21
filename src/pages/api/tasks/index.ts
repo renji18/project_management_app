@@ -1,6 +1,11 @@
 import { authConfig } from "@/server/auth/config";
 import { prisma } from "@/server/db";
-import { type CreateTaskInput, createTaskSchema } from "@/utils/zod";
+import {
+  type CreateTaskInput,
+  createTaskSchema,
+  taskMemberSchema,
+  userEmailsSchema,
+} from "@/utils/zod";
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 
@@ -27,18 +32,54 @@ export default async function handler(
         },
       });
 
+      const parsedData = await taskMemberSchema.parseAsync({
+        taskId: String(task.id),
+        userId: String(session.user.id),
+        type: "owner",
+      });
+
+      await prisma.taskMember.create({ data: parsedData });
+
+      if (parsedBody.userEmails && Array.isArray(parsedBody.userEmails)) {
+        const users = await prisma.user.findMany({
+          where: { email: { in: parsedBody.userEmails } },
+          select: { id: true },
+        });
+
+        const taskMembers = users.map((u) => ({
+          taskId: task.id,
+          userId: u.id,
+          type: "member",
+        }));
+
+        await prisma.taskMember.createMany({
+          data: taskMembers,
+          skipDuplicates: true,
+        });
+      }
+
       return res.status(201).json(task);
     } catch (error) {
-      return res
-        .status(500)
-        .json({ error: "Failed to create task", details: error });
+      console.error("Error creating task:", error);
+
+      return res.status(500).json({
+        error: "Failed to create task",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   }
 
   if (req.method === "GET") {
     try {
       const tasks = await prisma.task.findMany({
-        where: { userId: session.user.id },
+        where: {
+          members: {
+            some: { userId: session.user.id },
+          },
+        },
+        include: {
+          members: { include: { user: true } },
+        },
         orderBy: { createdAt: "desc" },
       });
 

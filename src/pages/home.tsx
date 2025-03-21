@@ -1,85 +1,76 @@
-import CreateNewTask from "@/components/CreateNewTask";
 import Header from "@/components/Header";
 import Layout from "@/components/Layout";
+import SingleTask from "@/components/SingleTask";
+import TaskCard from "@/components/TaskCard";
 import { type RootState } from "@/store";
-import { setTasks, type Task } from "@/store/slices/taskSlice";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function Home() {
-  const dispatch = useDispatch();
   const tasks = useSelector((state: RootState) => state.tasks.tasks);
+  const { data: session } = useSession();
 
-  console.log(tasks, "task");
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const res = await fetch("/api/tasks");
-        if (!res.ok) throw new Error("Failed to fetch tasks");
-
-        const data = (await res.json()) as Task[];
-        dispatch(setTasks(data));
-      } catch (error) {
-        console.error("Failed to fetch tasks", error);
-      }
-    };
-
-    void fetchTasks();
-  }, [dispatch]);
+  const [openModal, setOpenModal] = useState(false);
+  const [editTask, setEditTask] = useState<string | null>(null);
 
   return (
     <>
-      <Header title="Dashboard" />
+      <Header title="Your Tasks" />
       <Layout>
-        <div className="flex h-full flex-col items-center justify-center">
-          {tasks?.length > 0 ? (
+        {tasks?.length > 0 &&
+        tasks.some(
+          (t) => t.status !== "completed" && t.userId === session?.user.id,
+        ) ? (
+          <div className="relative flex h-full flex-col items-center">
             <div className="w-full max-w-3xl p-5">
               <h1 className="mb-4 text-center text-2xl font-bold">
                 Your Tasks
               </h1>
               <ul className="space-y-3">
-                {tasks.map((task) => (
-                  <li
-                    key={task.id}
-                    className="flex items-center justify-between rounded border bg-white p-4 shadow-sm"
-                  >
-                    <div>
-                      <h2 className="text-lg font-semibold">{task.title}</h2>
-                      <p className="text-gray-600">
-                        {task.description ?? "No description"}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Priority:{" "}
-                        <span className="font-semibold">{task.priority}</span>
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Status:{" "}
-                        <span className="font-semibold">{task.status}</span>
-                      </p>
-                      {task.deadline && (
-                        <p className="text-sm text-gray-500">
-                          Deadline:{" "}
-                          <span className="font-semibold">
-                            {new Date(task.deadline).toDateString()}
-                          </span>
-                        </p>
-                      )}
-                    </div>
-                  </li>
-                ))}
+                {tasks
+                  .filter(
+                    (t) =>
+                      t.userId === session?.user.id && t.status !== "completed",
+                  )
+                  .map((task) => (
+                    <SingleTask
+                      key={task.id}
+                      task={task}
+                      setEditTask={setEditTask}
+                      setOpenModal={setOpenModal}
+                    />
+                  ))}
               </ul>
-              <div className="mt-5 flex justify-center">
-                <CreateNewTask />
-              </div>
+
+              <button
+                className="absolute right-0 top-0 rounded-md bg-gray-800 px-3 py-1 text-sm text-white"
+                onClick={() => setOpenModal(true)}
+              >
+                Create Task
+              </button>
             </div>
-          ) : (
-            <div className="space-y-2">
-              <h1 className="text-center">You don&apos;t have any tasks</h1>
-              <CreateNewTask />
-            </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center gap-4">
+            <h1 className="text-center text-lg">
+              You don&apos;t have any tasks
+            </h1>
+            <button
+              onClick={() => setOpenModal(true)}
+              className="rounded-md bg-gray-800 px-3 py-1 text-sm text-white"
+            >
+              Create Task
+            </button>
+          </div>
+        )}
+
+        {openModal && (
+          <TaskCard
+            setOpenModal={setOpenModal}
+            taskId={editTask ?? undefined}
+          />
+        )}
       </Layout>
     </>
   );

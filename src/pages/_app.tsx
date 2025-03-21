@@ -30,7 +30,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <Provider store={store}>
         <div className={GeistSans.className}>
           <Component {...pageProps} />
-          <Toaster richColors position="top-right" />
+          <Toaster richColors position="bottom-right" />
         </div>
       </Provider>
     </SessionProvider>

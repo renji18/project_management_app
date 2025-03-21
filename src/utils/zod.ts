@@ -24,11 +24,14 @@ export const signUpSchema = object({
     .max(32, "Password must be less than 32 characters"),
 });
 
+export const userEmailsSchema = z.array(z.string().email()).optional();
+
 export const createTaskSchema = object({
   title: string().min(1, "Title is required"),
   description: string().optional(),
   priority: z.enum(["low", "medium", "high"]).default("medium"),
   deadline: string().nullable().optional(),
+  userEmails: userEmailsSchema,
 });
 
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
@@ -39,6 +42,13 @@ export const updateTaskSchema = object({
   priority: z.enum(["low", "medium", "high"]).optional(),
   status: z.enum(["pending", "in-progress", "completed"]).optional(),
   deadline: string().nullable().optional(),
+  userEmails: userEmailsSchema,
 });
 
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
+
+export const taskMemberSchema = object({
+  taskId: string().min(1, "Task ID is required"),
+  userId: string().min(1, "User ID is required"),
+  type: z.enum(["owner", "member"]),
+});

@@ -1,12 +1,31 @@
+import { setTasks, type Task } from "@/store/slices/taskSlice";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
+  const dispatch = useDispatch();
   const { data: session, status } = useSession();
 
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const res = await fetch("/api/tasks");
+        if (!res.ok) throw new Error("Failed to fetch tasks");
+
+        const data = (await res.json()) as Task[];
+        dispatch(setTasks(data));
+      } catch (error) {
+        console.error("Failed to fetch tasks", error);
+      }
+    };
+
+    void fetchTasks();
+  }, [dispatch]);
 
   // Redirect to login if not authenticated
   if (status === "unauthenticated") {
@@ -35,6 +54,30 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </li>
             <li>
               <Link
+                href="/assigned"
+                className={`px-2 py-1 ${
+                  isActive("/assigned")
+                    ? "text-blue-400 underline"
+                    : "text-white"
+                }`}
+              >
+                Assigned Tasks
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/archive"
+                className={`px-2 py-1 ${
+                  isActive("/archive")
+                    ? "text-blue-400 underline"
+                    : "text-white"
+                }`}
+              >
+                Archive
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/profile"
                 className={`px-2 py-1 ${
                   isActive("/profile")
@@ -43,18 +86,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 }`}
               >
                 Profile
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/notification"
-                className={`px-2 py-1 ${
-                  isActive("/notification")
-                    ? "text-blue-400 underline"
-                    : "text-white"
-                }`}
-              >
-                Notifications
               </Link>
             </li>
           </ul>

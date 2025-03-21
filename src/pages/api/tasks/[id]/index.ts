@@ -16,6 +16,20 @@ export default async function handler(
   if (typeof id !== "string")
     return res.status(400).json({ error: "Invalid task ID" });
 
+  const isOwner = await prisma.taskMember.findFirst({
+    where: {
+      taskId: id,
+      userId: session.user.id,
+      type: "owner",
+    },
+  });
+
+  if (!isOwner) {
+    return res
+      .status(403)
+      .json({ error: "Forbidden: Only the owner can modify the task" });
+  }
+
   if (req.method === "PUT") {
     try {
       const parsedData = await updateTaskSchema.parseAsync(req.body);
@@ -30,6 +44,24 @@ export default async function handler(
           deadline: parsedData.deadline ? new Date(parsedData.deadline) : null,
         },
       });
+
+      if (parsedData.userEmails && Array.isArray(parsedData.userEmails)) {
+        const users = await prisma.user.findMany({
+          where: { email: { in: parsedData.userEmails } },
+          select: { id: true },
+        });
+
+        const taskMembers = users.map((user) => ({
+          taskId: id,
+          userId: user.id,
+          type: "member",
+        }));
+
+        await prisma.taskMember.createMany({
+          data: taskMembers,
+          skipDuplicates: true,
+        });
+      }
 
       return res.status(200).json(updatedTask);
     } catch (error) {
