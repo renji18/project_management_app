@@ -6,7 +6,7 @@ export const signInSchema = object({
     .email("Invalid email"),
   password: string({ required_error: "Password is required" })
     .min(1, "Password is required")
-    .min(8, "Password must be more than 8 characters")
+    .min(4, "Password must be more than 4 characters")
     .max(32, "Password must be less than 32 characters"),
 });
 
@@ -20,7 +20,7 @@ export const signUpSchema = object({
     .email("Invalid email"),
   password: string({ required_error: "Password is required" })
     .min(1, "Password is required")
-    .min(8, "Password must be more than 8 characters")
+    .min(4, "Password must be more than 4 characters")
     .max(32, "Password must be less than 32 characters"),
 });
 
@@ -51,4 +51,21 @@ export const taskMemberSchema = object({
   taskId: string().min(1, "Task ID is required"),
   userId: string().min(1, "User ID is required"),
   type: z.enum(["owner", "member"]),
+});
+
+export const updateNameSchema = object({
+  name: string({ required_error: "Name is required" }).min(
+    2,
+    "Name must be at least 2 characters",
+  ),
+});
+
+export const updatePasswordSchema = object({
+  oldPassword: string({ required_error: "Old password is required" }).min(
+    4,
+    "Password must be at least 4 characters",
+  ),
+  newPassword: string({ required_error: "New password is required" })
+    .min(4, "Password must be at least 4 characters")
+    .max(32, "Password must be less than 32 characters"),
 });

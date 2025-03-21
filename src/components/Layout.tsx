@@ -1,13 +1,16 @@
+import { type RootState } from "@/store";
 import { setTasks, type Task } from "@/store/slices/taskSlice";
+import { setUser, type User } from "@/store/slices/userSlice";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useDispatch();
-  const { data: session, status } = useSession();
+  const user = useSelector((state: RootState) => state.user.user);
+  const { status } = useSession();
 
   const router = useRouter();
 
@@ -27,6 +30,22 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     void fetchTasks();
   }, [dispatch]);
 
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const res = await fetch("/api/user");
+        if (!res.ok) throw new Error("Failed to fetch user details");
+
+        const data = (await res.json()) as User;
+        dispatch(setUser(data));
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    };
+
+    void fetchUserDetails();
+  }, [dispatch]);
+
   // Redirect to login if not authenticated
   if (status === "unauthenticated") {
     if (typeof window !== "undefined") void router.push("/");
@@ -39,7 +58,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex h-screen flex-col">
       {/* Navbar */}
       <nav className="flex w-full items-center justify-between bg-gray-800 p-3 text-white">
-        <h2 className="text-lg font-bold">Welcome, {session?.user?.name}!</h2>
+        <h2 className="text-lg font-bold">Welcome, {user?.name}!</h2>
         <div className="flex items-center gap-12">
           <ul className="flex items-center gap-7 text-sm">
             <li>
