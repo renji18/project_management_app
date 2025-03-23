@@ -108,6 +108,25 @@ This project follows a **Full Stack Serverless Architecture** using **SST** and 
 - **Amazon RDS (via Supabase)** for persistent database storage.
 - **CloudFront** for frontend deployment.
 
+## **🧪 Running Tests**
+The project includes unit tests for API endpoints, Redux slices, and utility functions.
+
+### **1️⃣ Run All Tests**
+```sh
+npm test
+
+## **📊 Test Coverage**
+The test suite covers the following key functionalities:
+
+### **✅ API Tests (`src/__tests__/api/`)**
+- **`task.test.ts`**: Ensures task creation works correctly.
+
+### **✅ Redux Store Tests (`src/__tests__/store/`)**
+- **`taskSlice.test.ts`**: Verifies task state management (adding, updating, deleting tasks).
+
+### **✅ Utility Function Tests (`src/__tests__/utils/`)**
+- **`taskUtils.test.ts`**: Tests task-related utility functions, including status updates.
+
 
 ## **API Endpoints**
 
