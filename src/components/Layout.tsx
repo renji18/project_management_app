@@ -11,7 +11,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
   const { status } = useSession();
-
   const router = useRouter();
 
   useEffect(() => {
@@ -46,7 +45,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     void fetchUserDetails();
   }, [dispatch]);
 
-  // Redirect to login if not authenticated
   if (status === "unauthenticated") {
     if (typeof window !== "undefined") void router.push("/");
     return <div>Redirecting to login...</div>;
@@ -55,61 +53,36 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const isActive = (path: string) => router.pathname === path;
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col bg-gray-50">
       {/* Navbar */}
-      <nav className="flex w-full items-center justify-between bg-gray-800 p-3 text-white">
-        <h2 className="text-lg font-bold">Welcome, {user?.name}!</h2>
-        <div className="flex items-center gap-12">
-          <ul className="flex items-center gap-7 text-sm">
-            <li>
-              <Link
-                href="/home"
-                className={`px-2 py-1 ${
-                  isActive("/home") ? "text-blue-400 underline" : "text-white"
-                }`}
-              >
-                My Tasks
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/assigned"
-                className={`px-2 py-1 ${
-                  isActive("/assigned")
-                    ? "text-blue-400 underline"
-                    : "text-white"
-                }`}
-              >
-                Assigned Tasks
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/archive"
-                className={`px-2 py-1 ${
-                  isActive("/archive")
-                    ? "text-blue-400 underline"
-                    : "text-white"
-                }`}
-              >
-                Archive
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/profile"
-                className={`px-2 py-1 ${
-                  isActive("/profile")
-                    ? "text-blue-400 underline"
-                    : "text-white"
-                }`}
-              >
-                Profile
-              </Link>
-            </li>
+      <nav className="flex items-center justify-between bg-[#1E3A8A] px-6 py-4 text-white shadow-md">
+        <h2 className="text-lg font-semibold">
+          Welcome, <span className="font-bold">{user?.name}</span>!
+        </h2>
+        <div className="flex items-center gap-10">
+          <ul className="flex items-center gap-6 text-sm">
+            {[
+              { href: "/home", label: "My Tasks" },
+              { href: "/assigned", label: "Assigned Tasks" },
+              { href: "/archive", label: "Archive" },
+              { href: "/profile", label: "Profile" },
+            ].map(({ href, label }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className={`rounded-md px-3 py-1 transition ${
+                    isActive(href)
+                      ? "bg-white text-[#1E3A8A] shadow-sm"
+                      : "hover:bg-[#1A2F6A]"
+                  }`}
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
           </ul>
           <button
-            className="rounded bg-red-500 px-2 py-1 text-sm text-white"
+            className="rounded bg-red-500 px-3 py-1 text-sm font-medium text-white transition hover:bg-red-600"
             onClick={() => signOut({ callbackUrl: "/" })}
           >
             Sign Out
@@ -118,7 +91,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 p-5">{children}</main>
+      <main className="flex-1 overflow-y-auto px-8 py-6">{children}</main>
     </div>
   );
 };

@@ -61,8 +61,7 @@ const TaskCard = ({
   };
 
   useEffect(() => {
-    if (!tasks) return;
-    if (!taskId) return;
+    if (!tasks || !taskId) return;
     const task = tasks.find((t) => t.id === taskId);
     if (task) {
       setTaskData({
@@ -75,15 +74,16 @@ const TaskCard = ({
   }, [taskId, tasks]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold">
+        {/* Modal Header */}
+        <div className="mb-4 flex items-center justify-between border-b pb-3">
+          <h2 className="text-lg font-semibold text-gray-800">
             {taskId ? "Edit Task" : "Create New Task"}
           </h2>
           <button
             onClick={() => setOpenModal(false)}
-            className="rounded-full bg-gray-300 p-1.5 text-sm"
+            className="rounded-full bg-gray-200 p-1.5 transition hover:bg-gray-300"
           >
             <X size={20} />
           </button>
@@ -98,7 +98,7 @@ const TaskCard = ({
             <input
               type="text"
               placeholder="Enter task title"
-              className="mt-1 w-full rounded border p-2"
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
               value={taskData.title}
               onChange={(e) =>
                 setTaskData({ ...taskData, title: e.target.value })
@@ -111,10 +111,10 @@ const TaskCard = ({
             <span className="text-sm font-medium text-gray-700">
               Description
             </span>
-            <input
-              type="text"
+            <textarea
               placeholder="Enter task description"
-              className="mt-1 w-full rounded border p-2"
+              className="mt-1 w-full resize-none rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+              rows={3}
               value={taskData.description}
               onChange={(e) =>
                 setTaskData({ ...taskData, description: e.target.value })
@@ -126,15 +126,15 @@ const TaskCard = ({
           <label className="block">
             <span className="text-sm font-medium text-gray-700">Priority</span>
             <select
-              className="mt-1 w-full rounded border p-2"
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
               value={taskData.priority}
               onChange={(e) =>
                 setTaskData({ ...taskData, priority: e.target.value })
               }
             >
-              <option value="low">Low Priority</option>
-              <option value="medium">Medium Priority</option>
-              <option value="high">High Priority</option>
+              <option value="low">🟢 Low Priority</option>
+              <option value="medium">🟡 Medium Priority</option>
+              <option value="high">🔴 High Priority</option>
             </select>
           </label>
 
@@ -143,7 +143,7 @@ const TaskCard = ({
             <span className="text-sm font-medium text-gray-700">Deadline</span>
             <input
               type="date"
-              className="mt-1 w-full rounded border p-2"
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
               value={taskData.deadline}
               onChange={(e) =>
                 setTaskData({ ...taskData, deadline: e.target.value })
@@ -156,31 +156,35 @@ const TaskCard = ({
             <span className="text-sm font-medium text-gray-700">
               Assign Users
             </span>
-            <div className="flex gap-2">
+            <div className="mt-1 flex items-center gap-2">
               <input
                 type="email"
-                className="mt-1 w-full rounded border p-2"
+                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
                 placeholder="Enter user email"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
               />
               <button
                 onClick={addUserEmail}
-                className="rounded bg-green-600 px-3 py-1 text-white"
+                className="rounded bg-green-600 px-3 py-2 text-sm text-white transition hover:bg-green-700"
               >
                 Add
               </button>
             </div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {userEmails.map((email) => (
-                <span
-                  key={email}
-                  className="rounded bg-gray-200 px-2 py-1 text-xs"
-                >
-                  {email}
-                </span>
-              ))}
-            </div>
+
+            {/* Assigned Users */}
+            {userEmails.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {userEmails.map((email) => (
+                  <span
+                    key={email}
+                    className="rounded bg-gray-200 px-3 py-1 text-xs text-gray-700"
+                  >
+                    {email}
+                  </span>
+                ))}
+              </div>
+            )}
           </label>
 
           {/* Save Task Button */}
@@ -188,7 +192,7 @@ const TaskCard = ({
             onClick={handleTaskData}
             className="mt-4 w-full rounded bg-blue-700 py-2 text-white transition hover:bg-blue-800"
           >
-            Save Task
+            {taskId ? "Update Task" : "Create Task"}
           </button>
         </div>
       </div>

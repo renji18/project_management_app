@@ -6,6 +6,7 @@ import { type RootState } from "@/store";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { Plus } from "lucide-react";
 
 export default function Home() {
   const tasks = useSelector((state: RootState) => state.tasks.tasks);
@@ -14,57 +15,57 @@ export default function Home() {
   const [openModal, setOpenModal] = useState(false);
   const [editTask, setEditTask] = useState<string | null>(null);
 
+  const userTasks = tasks?.filter(
+    (task) => task.userId === session?.user.id && task.status !== "completed",
+  );
+
   return (
     <>
       <Header title="Your Tasks" />
       <Layout>
-        {tasks?.length > 0 &&
-        tasks.some(
-          (t) => t.status !== "completed" && t.userId === session?.user.id,
-        ) ? (
-          <div className="relative flex h-full flex-col items-center">
-            <div className="w-full max-w-3xl p-5">
-              <h1 className="mb-4 text-center text-2xl font-bold">
-                Your Tasks
-              </h1>
-              <ul className="space-y-3">
-                {tasks
-                  .filter(
-                    (t) =>
-                      t.userId === session?.user.id && t.status !== "completed",
-                  )
-                  .map((task) => (
-                    <SingleTask
-                      key={task.id}
-                      task={task}
-                      setEditTask={setEditTask}
-                      setOpenModal={setOpenModal}
-                    />
-                  ))}
-              </ul>
-
-              <button
-                className="absolute right-0 top-0 rounded-md bg-gray-800 px-3 py-1 text-sm text-white"
-                onClick={() => setOpenModal(true)}
-              >
-                Create Task
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-4">
-            <h1 className="text-center text-lg">
-              You don&apos;t have any tasks
+        <div className="relative flex h-full flex-col items-center px-5">
+          <div className="w-full max-w-3xl">
+            <h1 className="mb-5 text-center text-2xl font-semibold text-gray-800">
+              Your Tasks
             </h1>
-            <button
-              onClick={() => setOpenModal(true)}
-              className="rounded-md bg-gray-800 px-3 py-1 text-sm text-white"
-            >
-              Create Task
-            </button>
-          </div>
-        )}
 
+            {userTasks?.length > 0 ? (
+              <ul className="space-y-3">
+                {userTasks.map((task) => (
+                  <SingleTask
+                    key={task.id}
+                    task={task}
+                    setEditTask={setEditTask}
+                    setOpenModal={setOpenModal}
+                  />
+                ))}
+              </ul>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-4 pt-10">
+                <h2 className="text-center text-lg text-gray-600">
+                  You don&apos;t have any tasks
+                </h2>
+                <button
+                  onClick={() => setOpenModal(true)}
+                  className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white transition hover:bg-blue-700"
+                >
+                  Create Task
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Floating Create Task Button */}
+          <button
+            className="fixed bottom-6 right-6 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm text-white shadow-lg transition hover:bg-blue-700"
+            onClick={() => setOpenModal(true)}
+          >
+            <Plus size={16} />
+            Create Task
+          </button>
+        </div>
+
+        {/* Task Modal */}
         {openModal && (
           <TaskCard
             setOpenModal={setOpenModal}

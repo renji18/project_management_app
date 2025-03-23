@@ -1,29 +1,126 @@
-# Create T3 App
+# **Task Management App**
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A full-stack task management application built with **Next.js, Prisma, Redux, NextAuth.js, and SST (Serverless Stack) on AWS**.
 
-## What's next? How do I make an app with this?
+## **Table of Contents**
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+1. [Features](#features)
+2. [Tech Stack](#tech-stack)
+3. [Getting Started](#getting-started)
+   - [Prerequisites](#prerequisites)
+   - [Environment Variables](#environment-variables)
+   - [Installation](#installation)
+   - [Running Locally](#running-locally)
+4. [Architecture](#architecture)
+5. [Testing](#testing)
+6. [API Endpoints](#api-endpoints)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+---
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## **1. Features**
 
-## Learn More
+- User authentication with **NextAuth.js** (email/password & OAuth)
+- Task creation, assignment, and status tracking
+- Role-based access for task owners and assignees
+- Real-time updates using Redux for state management
+- UI with a clean and modern design
+- Serverless backend with **SST** deployed on AWS
+- Secure user authentication & password hashing
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+---
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+## **2. Tech Stack**
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+### **Frontend**
 
-## How do I deploy this?
+- **Next.js** (React framework)
+- **Tailwind CSS** (for styling)
+- **Redux Toolkit** (state management)
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+### **Backend**
+
+- **Next.js API Routes** (server-side API)
+- **Prisma ORM** (database management)
+- **PostgreSQL (Supabase)** (database)
+- **NextAuth.js** (authentication)
+- **SST (Serverless Stack)** (for AWS deployment)
+
+---
+
+## **3. Getting Started**
+
+### **Prerequisites**
+
+Before you start, ensure you have:
+
+- **Node.js v18+** installed
+- **AWS CLI** configured (`AWS_PROFILE` set up)
+- **PostgreSQL Database (Supabase or Local DB)**
+
+### **Environment Variables**
+
+Create a `.env.local` file in the root directory and add the following:
+
+```env
+NEXTAUTH_SECRET=your_secret_key
+DATABASE_URL=Supabase pool url with pgbouncer=true
+DIRECT_DATABASE_URL=Supabase main url for migrations
+NEXTAUTH_URL=http://localhost:3000
+AWS_PROFILE=your_aws_profile
+PRISMA_CLIENT_ENGINE_EXPERIMENTAL_FEATURES=disable_prepared_statements
+```
+
+## **Installation**
+
+Clone the repository and install dependencies:
+
+```sh
+git clone https://github.com/renji18/project_management_app.git
+cd task-management-app
+npm install
+```
+
+## **Start The Development server**
+
+npm run dev
+
+## **Architecture**
+
+This project follows a **Full Stack Serverless Architecture** using **SST** and **Next.js**.
+
+### **Frontend**
+
+- Built with **Next.js** and **TypeScript**.
+- Uses **Redux Toolkit** for state management.
+- **NextAuth.js** for authentication.
+- Tailwind CSS for styling.
+
+### **Backend**
+
+- Serverless API using **SST (Serverless Stack)** deployed on **AWS Lambda**.
+- **Prisma ORM** with **PostgreSQL (Supabase)** as the database.
+- Authentication and session management handled via **NextAuth.js** with database-backed sessions.
+
+### **Infrastructure**
+
+- **SST (Serverless Stack)** for backend deployment.
+- **AWS Lambda** for executing API functions.
+- **Amazon RDS (via Supabase)** for persistent database storage.
+- **CloudFront** for frontend deployment.
+
+
+## **API Endpoints**
+
+| Method | Endpoint         | Description                                      |
+|--------|-----------------|--------------------------------------------------|
+| POST   | /api/auth/register | Register a new user                           |
+| POST   | /api/auth/signin   | Authenticate and log in a user                 |
+| POST   | /api/auth/signout  | Log out the authenticated user                 |
+| GET    | /api/user          | Get authenticated user details                 |
+| PUT    | /api/user/name     | Update the authenticated user's name           |
+| PUT    | /api/user/password | Change the user's password                     |
+| DELETE | /api/user          | Delete the authenticated user account          |
+| GET    | /api/tasks         | Retrieve all tasks for the authenticated user  |
+| POST   | /api/tasks         | Create a new task                              |
+| PUT    | /api/tasks/:id     | Update an existing task                        |
+| DELETE | /api/tasks/:id     | Delete a task                                  |

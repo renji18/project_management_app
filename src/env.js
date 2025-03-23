@@ -12,8 +12,10 @@ export const env = createEnv({
         ? z.string()
         : z.string().optional(),
     // AUTH_DISCORD_ID: z.string(),
-    // AUTH_DISCORD_SECRET: z.string(),
+    NEXTAUTH_URL: z.string().url(),
     DATABASE_URL: z.string().url(),
+    PRISMA_CLIENT_ENGINE_EXPERIMENTAL_FEATURES: z.string(),
+    DIRECT_DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -34,9 +36,12 @@ export const env = createEnv({
    */
   runtimeEnv: {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    PRISMA_CLIENT_ENGINE_EXPERIMENTAL_FEATURES:
+      process.env.PRISMA_CLIENT_ENGINE_EXPERIMENTAL_FEATURES,
     // AUTH_DISCORD_ID: process.env.AUTH_DISCORD_ID,
-    // AUTH_DISCORD_SECRET: process.env.AUTH_DISCORD_SECRET,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     DATABASE_URL: process.env.DATABASE_URL,
+    DIRECT_DATABASE_URL: process.env.DIRECT_DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

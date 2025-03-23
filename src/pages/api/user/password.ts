@@ -3,7 +3,7 @@ import { prisma } from "@/server/db";
 import { updatePasswordSchema } from "@/utils/zod";
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export default async function handler(
   req: NextApiRequest,

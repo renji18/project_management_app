@@ -1,7 +1,7 @@
 import { prisma } from "@/server/db";
 import { signUpSchema } from "@/utils/zod";
 import { type NextApiRequest, type NextApiResponse } from "next";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export default async function handler(
   req: NextApiRequest,
@@ -33,6 +33,8 @@ export default async function handler(
       .status(201)
       .json({ message: "User registered successfully", user });
   } catch (error) {
+    console.log(error, 'err');
+    
     return res.status(400).json({ error: "Invalid request", details: error });
   }
 }

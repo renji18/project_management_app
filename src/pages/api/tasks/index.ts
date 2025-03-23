@@ -4,7 +4,6 @@ import {
   type CreateTaskInput,
   createTaskSchema,
   taskMemberSchema,
-  userEmailsSchema,
 } from "@/utils/zod";
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
