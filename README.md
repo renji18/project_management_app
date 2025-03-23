@@ -1,6 +1,6 @@
 # **Task Management App**
 
-A full-stack task management application built with **Next.js, Prisma, Redux, NextAuth.js, and SST (Serverless Stack) on AWS**.
+A full-stack task management application built with **Next.js, Prisma, Redux, NextAuth.js, and SST (Serverless Stack) on AWS**. (easySLR Assignment)
 
 ## **Table of Contents**
 
